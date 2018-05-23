@@ -13,7 +13,7 @@
   },
   "scripts": {
     "debug": "node debug app.js",
-    "prestart": "gulp copy min-concat-css && npm run bundle",
+    "prestart": "gulp copy min-concat-css && npm run bundle && npm run sw-bundle",
     "start": "node app.js",
     "gulp": "gulp",
     "dev": "gulp copy min-concat-css && npm run dev-bundle && npm run sw-bundle && node app.js",
