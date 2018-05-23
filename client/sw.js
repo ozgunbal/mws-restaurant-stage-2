@@ -2,41 +2,34 @@ const staticCacheName = "restaurant-v1";
 const imageCache = "restaurant-images";
 const allCaches = [staticCacheName, imageCache];
 
-self.addEventListener('install', function (event) {
+self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(staticCacheName).then(function (cache) {
-            return cache.addAll([
+        caches.open(staticCacheName).then((cache) => (
+            cache.addAll([
                 '/',
                 '/restaurant.html',
-                '/js/main.js',
-                '/js/dbhelper.js',
-                '/js/restaurant_info.js',
-                '/css/styles.css',
-                '/css/queries.css',
-                '/css/restaurantQueries.css',
-                '/data/restaurants.json',
-            ]);
-        }).catch(function (error) {
-            console.log(error);
-        })
+                '/js/main.bundle.js',
+                '/js/restaurant_info.bundle.js',
+                '/css/style.min.css',
+                '/manifest.json'
+            ])
+        )).catch(error => console.log(error))
     );
 });
 
-self.addEventListener('activate', function (event) {
+self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then(function (cacheNames) {
+        caches.keys().then((cacheNames) => {
             return Promise.all(
-                cacheNames.filter(function (cacheName) {
-                    return !allCaches.includes(cacheName);
-                }).map(function (cacheName) {
-                    return caches.delete(cacheName);
-                })
+                cacheNames
+                    .filter(cacheName => !allCaches.includes(cacheName))
+                    .map(cacheName => caches.delete(cacheName))
             );
         })
     );
 });
 
-self.addEventListener('fetch', function (event) {
+self.addEventListener('fetch', (event) => {
     var requestUrl = new URL(event.request.url);
 
     if (requestUrl.origin === location.origin) {
@@ -51,21 +44,19 @@ self.addEventListener('fetch', function (event) {
     }
 
     event.respondWith(
-        caches.match(event.request).then(function (response) {
-            return response || fetch(event.request);
-        })
+        caches.match(event.request).then(response => response || fetch(event.request))
     );
 });
 
 function serverFromCache(request, cacheName, matchOptions) {
-    return caches.open(cacheName).then(function (cache) {
-        return cache.match(request.url, matchOptions).then(function (response) {
-            if (response) return response;
-
-            return fetch(request).then(function (networkResponse) {
-                cache.put(request.url, networkResponse.clone());
-                return networkResponse;
-            });
-        });
-    });
+    return caches.open(cacheName).then((cache) => 
+        cache.match(request.url, matchOptions).then((response) => 
+            response ? 
+                response :
+                fetch(request).then((networkResponse) => {
+                    cache.put(request.url, networkResponse.clone());
+                    return networkResponse;
+                })
+        )
+    );
 }

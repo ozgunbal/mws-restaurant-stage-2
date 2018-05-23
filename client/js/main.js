@@ -1,3 +1,5 @@
+import DBHelper from './dbhelper';
+
 let restaurants,
   neighborhoods,
   cuisines
@@ -5,19 +7,9 @@ var map
 var markers = []
 
 /**
- * Fetch neighborhoods and cuisines as soon as the page is loaded.
- */
-document.addEventListener('DOMContentLoaded', (event) => {
-  registerServiceWorker();
-  fetchNeighborhoods();
-  fetchCuisines();
-  if (!navigator.onLine) updateRestaurants();
-});
-
-/**
  * Fetch all neighborhoods and set their HTML.
  */
-fetchNeighborhoods = () => {
+const fetchNeighborhoods = () => {
   DBHelper.fetchNeighborhoods().then(neighborhoods => {
     self.neighborhoods = neighborhoods;
     fillNeighborhoodsHTML();
@@ -37,7 +29,7 @@ function renderElement({ type, props = {}, attributes = {} }) {
 /**
  * Set neighborhoods HTML.
  */
-fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
+const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
   const select = document.getElementById('neighborhoods-select');
   neighborhoods.forEach(neighborhood => {
     const option = renderElement({
@@ -55,7 +47,7 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
 /**
  * Fetch all cuisines and set their HTML.
  */
-fetchCuisines = () => {
+const fetchCuisines = () => {
   DBHelper.fetchCuisines().then(cuisines => {
     self.cuisines = cuisines;
     fillCuisinesHTML();
@@ -65,7 +57,7 @@ fetchCuisines = () => {
 /**
  * Set cuisines HTML.
  */
-fillCuisinesHTML = (cuisines = self.cuisines) => {
+const fillCuisinesHTML = (cuisines = self.cuisines) => {
   const select = document.getElementById('cuisines-select');
 
   cuisines.forEach(cuisine => {
@@ -94,13 +86,14 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
+  self.markers = [];
   updateRestaurants();
 }
 
 /**
  * Update page and map for current restaurants.
  */
-updateRestaurants = () => {
+const updateRestaurants = () => {
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
 
@@ -120,7 +113,7 @@ updateRestaurants = () => {
 /**
  * Clear current restaurants, their HTML and remove their map markers.
  */
-resetRestaurants = (restaurants) => {
+const resetRestaurants = (restaurants) => {
   // Remove all restaurants
   self.restaurants = [];
   const ul = document.getElementById('restaurants-list');
@@ -135,7 +128,7 @@ resetRestaurants = (restaurants) => {
 /**
  * Create all restaurants HTML and add them to the webpage.
  */
-fillRestaurantsHTML = (restaurants = self.restaurants) => {
+const fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
@@ -146,7 +139,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 /**
  * Create restaurant HTML.
  */
-createRestaurantHTML = (restaurant) => {
+const createRestaurantHTML = (restaurant) => {
   const li = renderElement({ type: 'li' });
 
   const itemChildren = [
@@ -192,7 +185,7 @@ createRestaurantHTML = (restaurant) => {
 /**
  * Add markers for current restaurants to the map.
  */
-addMarkersToMap = (restaurants = self.restaurants) => {
+const addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
@@ -207,7 +200,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
  * Register Service Worker
  */
 
-registerServiceWorker = () => {
+const registerServiceWorker = () => {
   if (!navigator.serviceWorker) return;
 
   navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(function (reg) {
@@ -217,6 +210,12 @@ registerServiceWorker = () => {
   })
 }
 
-document.addEventListener('keydown', function (event) {
-  if (event.keyCode === 9) console.log(document.activeElement);
-})
+/**
+ * Fetch neighborhoods and cuisines as soon as the page is loaded.
+ */
+document.addEventListener('DOMContentLoaded', (event) => {
+  registerServiceWorker();
+  fetchNeighborhoods();
+  fetchCuisines();
+  if (!navigator.onLine) updateRestaurants();
+});

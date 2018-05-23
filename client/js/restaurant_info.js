@@ -1,14 +1,12 @@
+import DBHelper from './dbhelper';
+
 let restaurant;
 var map;
-
-document.addEventListener('DOMContentLoaded', (event) => {
-  offlineLoad();
-});
 
 /**
  * Loads the content when offline
  */
-offlineLoad = () => {
+const offlineLoad = () => {
   if (!navigator.onLine) {
     fetchRestaurantFromURL((error, restaurant) => {
       if (error) { // Got an error!
@@ -52,7 +50,7 @@ window.initMap = () => {
 /**
  * Get current restaurant from page URL.
  */
-fetchRestaurantFromURL = (callback) => {
+const fetchRestaurantFromURL = (callback) => {
   if (self.restaurant) { // restaurant already fetched!
     callback(null, self.restaurant)
     return;
@@ -73,7 +71,7 @@ fetchRestaurantFromURL = (callback) => {
 /**
  * Create restaurant HTML and add it to the webpage
  */
-fillRestaurantHTML = (restaurant = self.restaurant) => {
+const fillRestaurantHTML = (restaurant = self.restaurant) => {
   const mapElement = document.getElementById('map');
   mapElement.setAttribute('aria-label', `Restaurant ${restaurant.name} on the map`);
   const name = document.getElementById('restaurant-name');
@@ -101,7 +99,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 /**
  * Create restaurant operating hours HTML table and add it to the webpage.
  */
-fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
+const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   const hours = document.getElementById('restaurant-hours');
   for (let key in operatingHours) {
     const row = renderElement({ type: 'tr' })
@@ -124,7 +122,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
   const title = renderElement({
     type: 'h3',
@@ -155,7 +153,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 /**
  * Create review HTML and add it to the webpage.
  */
-createReviewHTML = (review) => {
+const createReviewHTML = (review) => {
   const li = renderElement({
     type: 'li',
     attributes: { role: 'listitem' }
@@ -223,7 +221,7 @@ createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */
-fillBreadcrumb = (restaurant = self.restaurant) => {
+const fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.querySelector('#breadcrumb>ol');
   const li = renderElement({
     type: 'li',
@@ -236,7 +234,7 @@ fillBreadcrumb = (restaurant = self.restaurant) => {
 /**
  * Get a parameter by name from page URL.
  */
-getParameterByName = (name, url) => {
+const getParameterByName = (name, url) => {
   if (!url)
     url = window.location.href;
   name = name.replace(/[\[\]]/g, '\\$&');
@@ -248,3 +246,7 @@ getParameterByName = (name, url) => {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
+document.addEventListener('DOMContentLoaded', (event) => {
+  offlineLoad();
+});
